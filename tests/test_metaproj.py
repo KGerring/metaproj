@@ -1,6 +1,6 @@
-from click.testing import CliRunner
+import pytest
 
 def test_main():
-    runner = CliRunner()
-    pass
+	assert True
+	
 
