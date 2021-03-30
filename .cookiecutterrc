@@ -1,0 +1,39 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary project-path
+#
+# See:
+#    https://pypi.python.org/pypi/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=project-path/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    _template:                 '/Users/kristen/PycharmProjects/Git/pycutter'
+    c_extension_support:       'no'
+    codecov:                   'yes'
+    command_line_interface:    'click'
+    command_line_interface_bin_name: 'metaproj'
+    distribution_name:         'metaproj'
+    email:                     'KGerring@gmail.com'
+    full_name:                 'KGerring'
+    github_username:           'KGerring'
+    license:                   'MIT license'
+    linter:                    'pylint'
+    package_name:              'metaproj'
+    project_name:              'metaproj'
+    project_short_description: 'metaproj repo'
+    release_date:              'today'
+    repo_name:                 'metaproj'
+    sphinx_theme:              'sphinx-rtd-theme'
+    test_runner:               'pytest'
+    version:                   '0.1.0'
+    website:                   'https://github.com/KGerring'
+    year:                      'now'
