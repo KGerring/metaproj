@@ -23,8 +23,10 @@ jobs:
     - name: Install dependencies
       run: |
         python3.9 -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip3.9 install pytest
+        
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
       run: |
-        pytest
+        pip3.9 install pytest-cov
+        pytest tests --doctest-modules --cov-report=html
