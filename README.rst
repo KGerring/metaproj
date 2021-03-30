@@ -3,6 +3,7 @@ Overview
 ========
 
 metaproj repo
+![Build Status](https://github.com/KGerring/metaproj/workflows/pytesting/badge.svg)
 
 * Free software: MIT license
 
