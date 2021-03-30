@@ -2,3 +2,5 @@ hypothesis
 click
 attrs
 pydantic
+pytest-github-actions-annotate-failures
+pytest-cov
