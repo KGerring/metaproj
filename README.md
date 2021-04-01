@@ -9,3 +9,4 @@
 
 
 [DeepSource](https://deepsource.io/docs/)
+[Codacy](https://app.codacy.com/gh/KGerring/metaproj/dashboard)
