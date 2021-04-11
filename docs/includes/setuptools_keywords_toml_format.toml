@@ -1,0 +1,183 @@
+[[options]]
+name = 'zip_safe'
+types = ['bool']
+
+[[options]]
+name = 'setup_requires'
+types = ['list-semi']
+
+[[options]]
+name = 'install_requires'
+types = ['list-semi']
+
+[[options]]
+name = 'extras_require'
+types = ['section']
+
+[[options]]
+name = 'python_requires'
+types = ['str']
+
+[[options]]
+name = 'entry_points'
+types = ['file:', 'section']
+
+[[options]]
+name = 'use_2to3'
+types = ['bool']
+
+[[options]]
+name = 'use_2to3_fixers'
+types = ['list-comma']
+
+[[options]]
+name = 'use_2to3_exclude_fixers'
+types = ['list-comma']
+
+[[options]]
+name = 'convert_2to3_doctests'
+types = ['list-comma']
+
+[[options]]
+name = 'scripts'
+types = ['list-comma']
+
+[[options]]
+name = 'eager_resources'
+types = ['list-comma']
+
+[[options]]
+name = 'dependency_links'
+types = ['list-comma']
+
+[[options]]
+name = 'tests_require'
+types = ['list-semi']
+
+[[options]]
+name = 'include_package_data'
+types = ['bool']
+
+[[options]]
+name = 'packages'
+types = ['find:', 'list-comma', 'find_namespace:']
+
+[[options]]
+name = 'package_dir'
+types = ['dict']
+
+[[options]]
+name = 'package_data'
+types = ['section']
+
+[[options]]
+name = 'exclude_package_data'
+types = ['section']
+
+[[options]]
+name = 'namespace_packages'
+types = ['list-comma']
+
+[[options]]
+name = 'py_modules'
+types = ['list-comma']
+
+[[options]]
+name = 'data_files'
+types = ['dict']
+
+
+### now metadata
+[[metadata]]
+tname = 'provides'
+types = list-comma
+
+[[metadata]]
+tname = 'name'
+types = str
+
+[[metadata]]
+tname = 'obsoletes'
+types = list-comma
+
+[[metadata]]
+tname = 'license'
+types = str
+
+[[metadata]]
+tname = 'keywords'
+types = list-comma
+
+[[metadata]]
+tname = 'project_urls'
+types = dict
+
+[[metadata]]
+tname = 'maintainer'
+types = str
+
+[[metadata]]
+tname = 'license_file'
+types = str
+
+[[metadata]]
+tname = 'long_description_content_type'
+types = str
+
+[[metadata]]
+tname = 'license_files'
+types = list-comma
+
+[[metadata]]
+tname = 'author'
+types = str
+
+[[metadata]]
+tname = 'requires'
+types = list-comma
+
+[[metadata]]
+tname = 'version'
+types = ['str', 'file:', 'attr:']
+
+[[metadata]]
+tname = 'download_url'
+alias = 'download-url'
+types = ['str']
+
+[[metadata]]
+tname = 'author_email'
+alias = 'author-email'
+types = ['str']
+
+[[metadata]]
+tname = 'maintainer_email'
+alias = 'maintainer-email'
+types = ['str']
+
+[[metadata]]
+tname = 'platforms'
+alias = 'platform'
+types = ['list-comma']
+
+[[metadata]]
+tname = 'description'
+alias = 'summary'
+types = ['str', 'file:']
+
+[[metadata]]
+tname = 'long_description'
+alias = 'long-description'
+types = ['str', 'file:']
+
+[[metadata]]
+tname = 'classifiers'
+alias = 'classifier'
+types = ['list-comma', 'file:']
+
+[[metadata]]
+tname = 'url'
+alias = 'home-page'
+types = ['str']
+
+

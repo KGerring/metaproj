@@ -1,0 +1,70 @@
+repos:
+-   repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+    -   id: autoflake
+        exclude: &fixtures tests/functional/|tests/input|tests/extensions/data|tests/regrtest_data/|tests/data/
+        args:
+            - --in-place
+            - --remove-all-unused-imports
+            - --expand-star-imports
+            - --remove-duplicate-keys
+            - --remove-unused-variables
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.1.0
+    hooks:
+    -   id: trailing-whitespace
+        exclude: "tests/functional/t/trailing_whitespaces.py"
+    -   id: end-of-file-fixer
+        exclude: "tests/functional/m/missing_final_newline.py|tests/functional/t/trailing_newlines.py"
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.5.2
+    hooks:
+    -   id: isort
+-   repo: https://github.com/ambv/black
+    rev: 20.8b1
+    hooks:
+    - id: black
+      args: [--safe, --quiet]
+      exclude: *fixtures
+-   repo: local
+    hooks:
+    -   id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        exclude: tests/functional/|tests/input|tests/extensions/data|tests/regrtest_data/|tests/data/|doc/
+-   repo: https://github.com/pre-commit/pre-commit
+    rev: v2.10.1
+    hooks:
+    -   id: validate_manifest
+-   repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v1.16.0
+    hooks:
+    -   id: setup-cfg-fmt
+
+-   repo: meta
+    hooks:
+    -   id: check-hooks-apply
+        language: system
+        name: Check hooks apply to the repository
+        files: .pre-commit-config.yaml
+        entry: /opt/python3.9.0/bin/python3.9 -m pre_commit.meta_hooks.check_hooks_apply
+    -   id: check-useless-excludes
+        name: Check for useless excludes
+        language: system
+        files: .pre-commit-config.yaml
+        entry: /opt/python3.9.0/bin/python3.9 -m pre_commit.meta_hooks.check_useless_excludes
+        types: [file]
+
+#.pre-commit-hooks.yaml
+
+#repo_path = store.clone(repo, ref)
+#manifest = load_manifest(os.path.join(repo_path, C.MANIFEST_FILE))
+# manifest = sorted(manifest, key=lambda hook: hook['id'])
+#hooks = [{'id': hook['id']} for hook in manifest]
+#config = {'repos': [{'repo': repo, 'rev': ref, 'hooks': hooks}]}
+
+
+

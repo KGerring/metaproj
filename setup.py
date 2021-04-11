@@ -14,7 +14,6 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-
 def read(*names, **kwargs):
     return io.open(
         join(dirname(__file__), *names),
