@@ -243,7 +243,7 @@ def read_file_coding(path):
     return _find_coding(''.join(result))
 
 
-def read_str_coding(source):
+def read_str_coding(source: str):
     if type(source) == bytes:
         newline = b'\n'
     else:
