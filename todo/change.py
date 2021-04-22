@@ -2,13 +2,11 @@ import datetime
 import difflib
 import os
 import time
-import taskhandle
-import fscommands
 from functools import lru_cache
-from . import exceptions, utils
+from . import exceptions, utils, fscommands, taskhandle
 
 
-class Change(object):
+class Change:
     """The base class for changes
 
      refactorings return `Change` objects.  They can be previewed,
@@ -105,7 +103,7 @@ class ChangeSet(Change):
             else:
                 string_date = date.strftime('%d %b, %Y')
             string_time = date.strftime('%H:%M:%S')
-            string_time = '%s %s ' % (string_date, string_time)
+            string_time = f'{string_date} {string_time} '
             return self.description + ' - ' + string_time
         return self.description
 
@@ -158,7 +156,7 @@ class ChangeContents(Change):
         self._operations.write_file(self.resource, self.old_contents)
 
     def __str__(self):
-        return 'Change <%s>' % self.resource.path
+        return f'Change <{self.resource.path}>'
 
     def get_description(self):
         new = self.new_contents
@@ -206,11 +204,10 @@ class MoveResource(Change):
         self._operations.move(self.new_resource, self.resource)
 
     def __str__(self):
-        return 'Move <%s>' % self.resource.path
+        return f'Move <{self.resource.path}>'
 
     def get_description(self):
-        return 'rename from %s\nrename to %s' % (self.resource.path,
-                                                 self.new_resource.path)
+        return f'rename from {self.resource.path}\nrename to {self.new_resource.path}'
 
     def get_changed_resources(self):
         return [self.resource, self.new_resource]
@@ -236,10 +233,10 @@ class CreateResource(Change):
         self._operations.remove(self.resource)
 
     def __str__(self):
-        return 'Create Resource <%s>' % (self.resource.path)
+        return f'Create Resource <{(self.resource.path)}>'
 
     def get_description(self):
-        return 'new file %s' % (self.resource.path)
+        return f'new file {(self.resource.path)}'
 
     def get_changed_resources(self):
         return [self.resource]
@@ -260,7 +257,7 @@ class CreateFolder(CreateResource):
     def __init__(self, parent, name):
         resource = parent.project.get_folder(
             self._get_child_path(parent, name))
-        super(CreateFolder, self).__init__(resource)
+        super().__init__(resource)
 
 
 class CreateFile(CreateResource):
@@ -271,7 +268,7 @@ class CreateFile(CreateResource):
 
     def __init__(self, parent, name):
         resource = parent.project.get_file(self._get_child_path(parent, name))
-        super(CreateFile, self).__init__(resource)
+        super().__init__(resource)
 
 
 class RemoveResource(Change):
@@ -296,7 +293,7 @@ class RemoveResource(Change):
             'Undoing `RemoveResource` is not implemented yet.')
 
     def __str__(self):
-        return 'Remove <%s>' % (self.resource.path)
+        return f'Remove <{(self.resource.path)}>'
 
     def get_changed_resources(self):
         return [self.resource]
@@ -314,7 +311,7 @@ def count_changes(change):
 def create_job_set(task_handle, change):
     return task_handle.create_jobset(str(change), count_changes(change))
 
-class _ResourceOperations(object):
+class _ResourceOperations:
 
     def __init__(self, project):
         self.project = project
@@ -356,12 +353,11 @@ class _ResourceOperations(object):
     def _create_resource(self, file_name, kind='file'):
         resource_path = self.project._get_resource_path(file_name)
         if os.path.exists(resource_path):
-            raise exceptions.Error('Resource <%s> already exists'
-                                       % resource_path)
+            raise exceptions.Error(f'Resource <{resource_path}> already exists')
         resource = self.project.get_file(file_name)
         if not resource.parent.exists():
             raise exceptions.ResourceNotFoundError(
-                'Parent folder of <%s> does not exist' % resource.path)
+                    f'Parent folder of <{resource.path}> does not exist')
         fscommands = self._get_fscommands(resource)
         try:
             if kind == 'file':
@@ -382,7 +378,7 @@ def _get_destination_for_move(resource, destination):
 
 #--json-report --xdoctest export PYTHONPATH="/opt/python3.9.0/lib/python3.9/site-packages:/opt/anaconda3/lib/python3.8/site-packages"
 
-class ChangeToData(object):
+class ChangeToData:
 
     def convertChangeSet(self, change):
         description = change.description
@@ -410,8 +406,7 @@ class ChangeToData(object):
         method = getattr(self, 'convert' + change_type.__name__)
         return (change_type.__name__, method(change))
 
-
-class DataToChange(object):
+class DataToChange:
 
     def __init__(self, project):
         self.project = project

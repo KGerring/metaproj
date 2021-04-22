@@ -31,7 +31,7 @@ def create_fscommands(root):
     return FileSystemCommands()
 
 
-class FileSystemCommands(object):
+class FileSystemCommands:
 
     def create_file(self, path):
         open(path, 'w').close()
@@ -56,7 +56,7 @@ class FileSystemCommands(object):
             file_.close()
 
 
-class SubversionCommands(object):
+class SubversionCommands:
 
     def __init__(self, *args):
         self.normal_actions = FileSystemCommands()
@@ -81,7 +81,7 @@ class SubversionCommands(object):
         self.normal_actions.write(path, data)
 
 
-class MercurialCommands(object):
+class MercurialCommands:
 
     def __init__(self, root):
         self.hg = self._import_mercurial()
@@ -125,7 +125,7 @@ class MercurialCommands(object):
         self.normal_actions.write(path, data)
 
 
-class GITCommands(object):
+class GITCommands:
 
     def __init__(self, root):
         self.root = root
@@ -158,7 +158,7 @@ class GITCommands(object):
         return self.root
 
 
-class DarcsCommands(object):
+class DarcsCommands:
 
     def __init__(self, root):
         self.root = root
@@ -203,13 +203,11 @@ def unicode_to_file_data(contents, encoding=None):
     except UnicodeEncodeError:
         return contents.encode('utf-8')
 
-
 def file_data_to_unicode(data, encoding=None):
     result = _decode_data(data, encoding)
     if '\r' in result:
         result = result.replace('\r\n', '\n').replace('\r', '\n')
     return result
-
 
 def _decode_data(data, encoding):
     if isinstance(data, unicode):

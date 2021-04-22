@@ -1,7 +1,6 @@
 from . import exceptions
 
-
-class TaskHandle(object):
+class TaskHandle:
 
     def __init__(self, name='Task', interrupts=True):
         """Construct a TaskHandle
@@ -52,8 +51,7 @@ class TaskHandle(object):
         for observer in list(self.observers):
             observer()
 
-
-class JobSet(object):
+class JobSet:
 
     def __init__(self, handle, name, count):
         self.handle = handle
@@ -88,8 +86,7 @@ class JobSet(object):
     def get_name(self):
         return self.name
 
-
-class NullTaskHandle(object):
+class NullTaskHandle:
 
     def __init__(self):
         pass
@@ -109,8 +106,7 @@ class NullTaskHandle(object):
     def add_observer(self, observer):
         pass
 
-
-class NullJobSet(object):
+class NullJobSet:
 
     def started_job(self, name):
         pass

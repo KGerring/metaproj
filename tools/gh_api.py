@@ -79,6 +79,17 @@ def get_auth_token():
     keyring.set_password('github', fake_username, token)
     return token
 
+def update_environ(envvar: str):
+    import subprocess, os
+    
+    VAR = (
+            subprocess.check_output(["bash", "--login", "-c", f"echo ${envvar}"]).decode().strip()
+    )
+    os.environ[envvar] = VAR
+    return VAR
+
+token = update_environ('GITHUB_TOKEN')
+
 def make_auth_header():
     return {'Authorization': 'token ' + get_auth_token()}
 

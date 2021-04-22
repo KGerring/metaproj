@@ -34,7 +34,7 @@ from . import exceptions
 from . import fscommands
 
 
-class Resource(object):
+class Resource:
     """Represents files and folders in a project"""
 
     def __init__(self, project, path):
@@ -43,13 +43,12 @@ class Resource(object):
 
     def move(self, new_location):
         """Move resource to `new_location`"""
-        self._perform_change(change.MoveResource(self, new_location),
-                             'Moving <%s> to <%s>' % (self.path, new_location))
+        self._perform_change(change.MoveResource(self, new_location), f'Moving <{self.path}> to <{new_location}>')
 
     def remove(self):
         """Remove resource from the project"""
         self._perform_change(change.RemoveResource(self),
-                             'Removing <%s>' % self.path)
+                             f'Removing <{self.path}>')
 
     def is_folder(self):
         """Return true if the resource is a folder"""
@@ -103,7 +102,7 @@ class File(Resource):
     """Represents a file"""
 
     def __init__(self, project, name):
-        super(File, self).__init__(project, name)
+        super().__init__(project, name)
 
     def read(self):
         data = self.read_bytes()
@@ -126,7 +125,7 @@ class File(Resource):
         except IOError:
             pass
         self._perform_change(change.ChangeContents(self, contents),
-                             'Writing file <%s>' % self.path)
+                             f'Writing file <{self.path}>')
 
     def is_folder(self):
         return False
@@ -139,7 +138,7 @@ class Folder(Resource):
     """Represents a folder"""
 
     def __init__(self, project, name):
-        super(Folder, self).__init__(project, name)
+        super().__init__(project, name)
 
     def is_folder(self):
         return True
@@ -205,7 +204,7 @@ class Folder(Resource):
         self.parent.create_folder(self.name)
 
 
-class _ResourceMatcher(object):
+class _ResourceMatcher:
 
     def __init__(self):
         self.patterns = []

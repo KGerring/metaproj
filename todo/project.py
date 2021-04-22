@@ -17,13 +17,36 @@ import sys
 from . import exceptions, taskhandle, history, resourceobserver, fscommands
 from .exceptions import ModuleNotFoundError
 from .resources import File, Folder, _ResourceMatcher
-from rope.base import pycore, utils
+from rope.base import pycore
 try:
 	import cPickle as pickle
 except ImportError:
 	import pickle
+import  warnings
+def saveit(func):
+	"""A decorator that caches the return value of a function"""
+	
+	name = '_' + func.__name__
+	
+	def _wrapper(self, *args, **kwds):
+		if not hasattr(self, name):
+			setattr(self, name, func(self, *args, **kwds))
+		return getattr(self, name)
+	return _wrapper
 
-class Prefs(object):
+def deprecated(message=None):
+	"""A decorator for deprecated functions"""
+	def _decorator(func, message=message):
+		if message is None:
+			message = '%s is deprecated' % func.__name__
+		
+		def newfunc(*args, **kwds):
+			warnings.warn(message, DeprecationWarning, stacklevel=2)
+			return func(*args, **kwds)
+		return newfunc
+	return _decorator
+
+class Prefs:
 	
 	def __init__(self):
 		self.prefs = {}
@@ -65,9 +88,7 @@ class Prefs(object):
 	def __getitem__(self, key):
 		return self.get(key)
 
-
-
-class _Project(object):
+class _Project:
 	
 	def __init__(self, fscommands):
 		self.observers = []
@@ -90,7 +111,7 @@ class _Project(object):
 		path = self._get_resource_path(resource_name)
 		if not os.path.exists(path):
 			raise exceptions.ResourceNotFoundError(
-					'Resource <%s> does not exist' % resource_name)
+					f'Resource <{resource_name}> does not exist')
 		elif os.path.isfile(path):
 			return File(self, resource_name)
 		elif os.path.isdir(path):
@@ -107,7 +128,7 @@ class _Project(object):
 			return pymod
 		module = self.find_module(name, folder)
 		if module is None:
-			raise ModuleNotFoundError('Module %s not found' % name)
+			raise ModuleNotFoundError(f'Module {name} not found')
 		return self.pycore.resource_to_pyobject(module)
 	
 	def get_python_path_folders(self):
@@ -183,7 +204,7 @@ class _Project(object):
 	def get_relative_module(self, name, folder, level):
 		module = self.find_relative_module(name, folder, level)
 		if module is None:
-			raise ModuleNotFoundError('Module %s not found' % name)
+			raise ModuleNotFoundError(f'Module {name} not found')
 		return self.pycore.resource_to_pyobject(module)
 	
 	def find_module(self, modname, folder=None):
@@ -220,12 +241,12 @@ class _Project(object):
 		pass
 	
 	@property
-	@utils.saveit
+	@saveit
 	def history(self):
 		return history.History(self)
 	
 	@property
-	@utils.saveit
+	@saveit
 	def pycore(self):
 		return pycore.PyCore(self)
 	
@@ -261,11 +282,10 @@ class Project(_Project):
 		if not os.path.exists(self._address):
 			os.mkdir(self._address)
 		elif not os.path.isdir(self._address):
-			raise exceptions.RopeError('Project root exists and'
-			                           ' is not a directory')
+			raise exceptions.RopeError('Project root exists and is not a directory')
 		if fscommands is None:
 			fscommands = rope.base.fscommands.create_fscommands(self._address)
-		super(Project, self).__init__(fscommands)
+		super().__init__(fscommands)
 		self.ignored = _ResourceMatcher()
 		self.file_list = _FileListCacher(self)
 		self.prefs.add_callback('ignored_resources', self.ignored.set_patterns)
@@ -274,7 +294,7 @@ class Project(_Project):
 		self._init_prefs(prefs)
 		self._init_source_folders()
 	
-	@utils.deprecated('Delete once deprecated functions are gone')
+	@deprecated('Delete once deprecated functions are gone')
 	def _init_source_folders(self):
 		for path in self.prefs.get('source_folders', []):
 			folder = self.get_resource(path)
@@ -357,7 +377,7 @@ class Project(_Project):
 	def validate(self, folder=None):
 		if folder is None:
 			folder = self.root
-		super(Project, self).validate(folder)
+		super().validate(folder)
 	
 	root = property(lambda self: self.get_resource(''))
 	address = property(lambda self: self._address)
@@ -371,7 +391,7 @@ class NoProject(_Project):
 	
 	def __init__(self):
 		fscommands = rope.base.fscommands.FileSystemCommands()
-		super(NoProject, self).__init__(fscommands)
+		super().__init__(fscommands)
 	
 	def _get_resource_path(self, name):
 		real_name = name.replace('/', os.path.sep)
@@ -379,7 +399,7 @@ class NoProject(_Project):
 	
 	def get_resource(self, name):
 		universal_name = _realpath(name).replace(os.path.sep, '/')
-		return super(NoProject, self).get_resource(universal_name)
+		return super().get_resource(universal_name)
 	
 	def get_files(self):
 		return []
@@ -396,7 +416,7 @@ def get_no_project():
 	return NoProject._no_project
 
 
-class _FileListCacher(object):
+class _FileListCacher:
 	
 	def __init__(self, project):
 		self.project = project
@@ -427,7 +447,7 @@ class _FileListCacher(object):
 		self.files = None
 
 
-class _DataFiles(object):
+class _DataFiles:
 	
 	def __init__(self, project):
 		self.project = project
