@@ -67,3 +67,5 @@ docs/_build
 
 # Ignore dynaconf secret files
 .secrets.*
+.ropeproject
+data/*

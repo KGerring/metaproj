@@ -1,0 +1,17 @@
+block_list_patterns:
+- '@generated'
+- '@nolint'
+block_list_rules:
+- Flake8PseudoLintRule
+- ExplicitFrozenDataclassRule
+- AwaitAsyncCallRule
+- UseIsNoneOnOptionalRule
+filename: null
+fixture_dir: ./fixtures
+formatter: []
+packages:
+- fixit.rules
+- fixit.dev_rules
+repo_root: .
+rule_config: {}
+use_noqa: false
