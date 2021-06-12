@@ -13,7 +13,6 @@ from os.path import splitext
 from setuptools import find_packages
 from setuptools import setup
 
-
 def read(*names, **kwargs):
     return io.open(
         join(dirname(__file__), *names),
@@ -21,7 +20,7 @@ def read(*names, **kwargs):
     ).read()
 
 
-setup(
+attrs = dict(
     name='metaproj',
     version='0.1.0',
     license='MIT license',
@@ -35,6 +34,7 @@ setup(
     url='https://github.com/KGerring/metaproj',
     packages=find_packages('metaproj'),
     package_dir={'': 'src'},
+    
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
@@ -78,3 +78,10 @@ setup(
     setup_requires=[]
 
 )
+
+
+
+if __name__ == '__main__':
+    setup(**attrs)
+
+

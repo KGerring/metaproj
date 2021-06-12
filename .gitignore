@@ -69,3 +69,4 @@ docs/_build
 .secrets.*
 .ropeproject
 data/*
+.DS_Store

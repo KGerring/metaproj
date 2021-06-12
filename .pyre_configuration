@@ -1,0 +1,19 @@
+{
+  "exclude": [
+    ".*/\\.tox/.*",
+    ".*/tests/.*",
+    "*.rules.*",
+    "*.dev_rules.*"
+  ],
+  "search_path": [],
+  "source_directories": [
+    "."
+  ],
+  "strict": false,
+  "taint_models_path": "/opt/python3.9.0/lib",
+  "typeshed": "/opt/python3.9.0/lib/pyre_check/typeshed",
+  "workers": 4,
+  "ignore_all_errors": [
+    "setup.py"
+  ]
+}

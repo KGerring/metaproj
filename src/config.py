@@ -25,10 +25,15 @@ condition is a callable to be executed and return boolean::
     # it is executed before operations.
     
 """
+from __future__ import annotations
+
 import sys
-sys.stdout.write("OKOKOK")
+
 from dynaconf import Dynaconf
-from dynaconf.base import Settings, LazySettings
+from dynaconf.base import LazySettings
+from dynaconf.base import Settings
+
+sys.stdout.write("OKOKOK")
 
 # dynaconf_settings
 # environments_for_dynaconf
@@ -71,6 +76,7 @@ settings = LazySettings(
                     'settings.yaml', '.secrets.yaml'],
 	secrets = [],
 )
+
 """
 # Extra file, or list of files where to look for secrets
 # useful for CI environment like jenkins
@@ -110,3 +116,6 @@ SKIP_FILES_FOR_DYNACONF = get("SKIP_FILES_FOR_DYNACONF", [])
 # LOWERCASE_READ_FOR_DYNACONF
 # `envvar_prefix` = export envvars with `export DYNACONF_FOO=bar`.
 # `settings_files` = Load this files in the order.
+
+if __name__ == '__main__':
+	print(settings.keys())

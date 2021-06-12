@@ -1,0 +1,24 @@
+block_list_patterns:
+- '@generated'
+- '@nolint'
+block_list_rules:
+- Flake8PseudoLintRule
+- ExplicitFrozenDataclassRule
+- AwaitAsyncCallRule
+- UseIsNoneOnOptionalRule
+filename: .
+fixture_dir: /Users/kristen/repos/Fixit/fixit/tests/fixtures
+packages:
+- fixit.rules
+- fixit.dev_rules
+repo_root: /Users/kristen/repos/Fixit
+rule_config:
+  ImportConstraintsRule:
+    fixit:
+      rules:
+      - - '*'
+        - allow
+  RemoveUnusedSuppressionsRule:
+    ignore_info: false
+    rules: []
+use_noqa: false

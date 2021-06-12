@@ -3,7 +3,7 @@ import difflib
 import os
 import time
 from functools import lru_cache
-from . import exceptions, utils, fscommands, taskhandle
+from . import exceptions, fscommands, taskhandle
 
 
 class Change:
