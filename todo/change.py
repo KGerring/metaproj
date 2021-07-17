@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import datetime
 import difflib
 import os
 import time
 from functools import lru_cache
+
 from . import exceptions, fscommands, taskhandle
 
 
@@ -84,27 +87,26 @@ class ChangeSet(Change):
         self.changes.append(change)
 
     def get_description(self):
-        result = [str(self) + ':\n\n\n']
+        result = [str(self) + ":\n\n\n"]
         for change in self.changes:
             result.append(change.get_description())
-            result.append('\n')
-        return ''.join(result)
+            result.append("\n")
+        return "".join(result)
 
     def __str__(self):
         if self.time is not None:
             date = datetime.datetime.fromtimestamp(self.time)
             if date.date() == datetime.date.today():
-                string_date = 'today'
-            elif date.date() == (datetime.date.today() -
-                                 datetime.timedelta(1)):
-                string_date = 'yesterday'
+                string_date = "today"
+            elif date.date() == (datetime.date.today() - datetime.timedelta(1)):
+                string_date = "yesterday"
             elif date.year == datetime.date.today().year:
-                string_date = date.strftime('%b %d')
+                string_date = date.strftime("%b %d")
             else:
-                string_date = date.strftime('%d %b, %Y')
-            string_time = date.strftime('%H:%M:%S')
-            string_time = f'{string_date} {string_time} '
-            return self.description + ' - ' + string_time
+                string_date = date.strftime("%d %b, %Y")
+            string_time = date.strftime("%H:%M:%S")
+            string_time = f"{string_date} {string_time} "
+            return self.description + " - " + string_time
         return self.description
 
     def get_changed_resources(self):
@@ -120,10 +122,12 @@ def _handle_job_set(function):
     A decorator for handling `taskhandle.JobSet` for `do` and `undo`
     methods of `Change`.
     """
+
     def call(self, job_set=taskhandle.NullJobSet()):
         job_set.started_job(str(self))
         function(self)
         job_set.finished_job()
+
     return call
 
 
@@ -151,12 +155,11 @@ class ChangeContents(Change):
     @_handle_job_set
     def undo(self):
         if self.old_contents is None:
-            raise exceptions.HistoryError(
-                'Undoing a change that is not performed yet!')
+            raise exceptions.HistoryError("Undoing a change that is not performed yet!")
         self._operations.write_file(self.resource, self.old_contents)
 
     def __str__(self):
-        return f'Change <{self.resource.path}>'
+        return f"Change <{self.resource.path}>"
 
     def get_description(self):
         new = self.new_contents
@@ -165,11 +168,9 @@ class ChangeContents(Change):
             if self.resource.exists():
                 old = self.resource.read()
             else:
-                old = ''
-        result = difflib.unified_diff(
-            old.splitlines(True), new.splitlines(True),
-            'a/' + self.resource.path, 'b/' + self.resource.path)
-        return ''.join(list(result))
+                old = ""
+        result = difflib.unified_diff(old.splitlines(True), new.splitlines(True), "a/" + self.resource.path, "b/" + self.resource.path)
+        return "".join(list(result))
 
     def get_changed_resources(self):
         return [self.resource]
@@ -204,10 +205,10 @@ class MoveResource(Change):
         self._operations.move(self.new_resource, self.resource)
 
     def __str__(self):
-        return f'Move <{self.resource.path}>'
+        return f"Move <{self.resource.path}>"
 
     def get_description(self):
-        return f'rename from {self.resource.path}\nrename to {self.new_resource.path}'
+        return f"rename from {self.resource.path}\nrename to {self.new_resource.path}"
 
     def get_changed_resources(self):
         return [self.resource, self.new_resource]
@@ -233,19 +234,19 @@ class CreateResource(Change):
         self._operations.remove(self.resource)
 
     def __str__(self):
-        return f'Create Resource <{(self.resource.path)}>'
+        return f"Create Resource <{(self.resource.path)}>"
 
     def get_description(self):
-        return f'new file {(self.resource.path)}'
+        return f"new file {(self.resource.path)}"
 
     def get_changed_resources(self):
         return [self.resource]
 
     def _get_child_path(self, parent, name):
-        if parent.path == '':
+        if parent.path == "":
             return name
         else:
-            return parent.path + '/' + name
+            return parent.path + "/" + name
 
 
 class CreateFolder(CreateResource):
@@ -255,8 +256,7 @@ class CreateFolder(CreateResource):
     """
 
     def __init__(self, parent, name):
-        resource = parent.project.get_folder(
-            self._get_child_path(parent, name))
+        resource = parent.project.get_folder(self._get_child_path(parent, name))
         super().__init__(resource)
 
 
@@ -289,11 +289,10 @@ class RemoveResource(Change):
     # TODO: Undoing remove operations
     @_handle_job_set
     def undo(self):
-        raise NotImplementedError(
-            'Undoing `RemoveResource` is not implemented yet.')
+        raise NotImplementedError("Undoing `RemoveResource` is not implemented yet.")
 
     def __str__(self):
-        return f'Remove <{(self.resource.path)}>'
+        return f"Remove <{(self.resource.path)}>"
 
     def get_changed_resources(self):
         return [self.resource]
@@ -308,11 +307,12 @@ def count_changes(change):
         return result
     return 1
 
+
 def create_job_set(task_handle, change):
     return task_handle.create_jobset(str(change), count_changes(change))
 
-class _ResourceOperations:
 
+class _ResourceOperations:
     def __init__(self, project):
         self.project = project
         self.fscommands = project.fscommands
@@ -338,7 +338,7 @@ class _ResourceOperations:
 
     def create(self, resource):
         if resource.is_folder():
-            self._create_resource(resource.path, kind='folder')
+            self._create_resource(resource.path, kind="folder")
         else:
             self._create_resource(resource.path)
         for observer in list(self.project.observers):
@@ -350,36 +350,37 @@ class _ResourceOperations:
         for observer in list(self.project.observers):
             observer.resource_removed(resource)
 
-    def _create_resource(self, file_name, kind='file'):
+    def _create_resource(self, file_name, kind="file"):
         resource_path = self.project._get_resource_path(file_name)
         if os.path.exists(resource_path):
-            raise exceptions.Error(f'Resource <{resource_path}> already exists')
+            raise exceptions.Error(f"Resource <{resource_path}> already exists")
         resource = self.project.get_file(file_name)
         if not resource.parent.exists():
-            raise exceptions.ResourceNotFoundError(
-                    f'Parent folder of <{resource.path}> does not exist')
+            raise exceptions.ResourceNotFoundError(f"Parent folder of <{resource.path}> does not exist")
         fscommands = self._get_fscommands(resource)
         try:
-            if kind == 'file':
+            if kind == "file":
                 fscommands.create_file(resource_path)
             else:
                 fscommands.create_folder(resource_path)
         except IOError as e:
             raise exceptions.Error(e)
 
+
 def _get_destination_for_move(resource, destination):
     dest_path = resource.project._get_resource_path(destination)
     if os.path.isdir(dest_path):
-        if destination != '':
-            return destination + '/' + resource.name
+        if destination != "":
+            return destination + "/" + resource.name
         else:
             return resource.name
     return destination
 
-#--json-report --xdoctest export PYTHONPATH="/opt/python3.9.0/lib/python3.9/site-packages:/opt/anaconda3/lib/python3.8/site-packages"
+
+# --json-report --xdoctest export PYTHONPATH="/opt/python3.9.0/lib/python3.9/site-packages:/opt/anaconda3/lib/python3.8/site-packages"
+
 
 class ChangeToData:
-
     def convertChangeSet(self, change):
         description = change.description
         changes = []
@@ -403,11 +404,11 @@ class ChangeToData:
         change_type = type(change)
         if change_type in (CreateFolder, CreateFile):
             change_type = CreateResource
-        method = getattr(self, 'convert' + change_type.__name__)
+        method = getattr(self, "convert" + change_type.__name__)
         return (change_type.__name__, method(change))
 
-class DataToChange:
 
+class DataToChange:
     def __init__(self, project):
         self.project = project
 
@@ -440,5 +441,19 @@ class DataToChange:
         return RemoveResource(resource)
 
     def __call__(self, data):
-        method = getattr(self, 'make' + data[0])
+        method = getattr(self, "make" + data[0])
         return method(*data[1])
+
+
+__all__ = sorted(
+    [
+        getattr(v, "__name__", k)
+        for k, v in list(globals().items())  # export
+        if ((callable(v) and getattr(v, "__module__", "") == __name__ or k.isupper()) and not getattr(v, "__name__", k).startswith("__"))  # callables from this module  # or CONSTANTS
+    ]
+)  # neither marked internal
+
+
+
+#####
+

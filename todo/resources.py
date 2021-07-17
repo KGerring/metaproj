@@ -26,29 +26,27 @@ getting the path relative to the project's root (via `path`), reading
 from and writing to the resource, moving the resource, etc.
 """
 
+from __future__ import annotations
+
 import os
 import re
 
-from . import change
-from . import exceptions
-from . import fscommands
+from . import change, exceptions, fscommands
 
 
 class Resource:
     """Represents files and folders in a project"""
-
     def __init__(self, project, path):
         self.project = project
         self._path = path
 
     def move(self, new_location):
         """Move resource to `new_location`"""
-        self._perform_change(change.MoveResource(self, new_location), f'Moving <{self.path}> to <{new_location}>')
+        self._perform_change(change.MoveResource(self, new_location), f"Moving <{self.path}> to <{new_location}>")
 
     def remove(self):
         """Remove resource from the project"""
-        self._perform_change(change.RemoveResource(self),
-                             f'Removing <{self.path}>')
+        self._perform_change(change.RemoveResource(self), f"Removing <{self.path}>")
 
     def is_folder(self):
         """Return true if the resource is a folder"""
@@ -61,7 +59,7 @@ class Resource:
 
     @property
     def parent(self):
-        parent = '/'.join(self.path.split('/')[0:-1])
+        parent = "/".join(self.path.split("/")[0:-1])
         return self.project.get_folder(parent)
 
     @property
@@ -76,7 +74,7 @@ class Resource:
     @property
     def name(self):
         """Return the name of this resource"""
-        return self.path.split('/')[-1]
+        return self.path.split("/")[-1]
 
     @property
     def real_path(self):
@@ -112,7 +110,7 @@ class File(Resource):
             raise exceptions.ModuleDecodeError(self.path, e.reason)
 
     def read_bytes(self):
-        handle = open(self.real_path, 'rb')
+        handle = open(self.real_path, "rb")
         try:
             return handle.read()
         finally:
@@ -124,8 +122,7 @@ class File(Resource):
                 return
         except IOError:
             pass
-        self._perform_change(change.ChangeContents(self, contents),
-                             f'Writing file <{self.path}>')
+        self._perform_change(change.ChangeContents(self, contents), f"Writing file <{self.path}>")
 
     def is_folder(self):
         return False
@@ -160,20 +157,16 @@ class Folder(Resource):
         return result
 
     def create_file(self, file_name):
-        self._perform_change(
-            change.CreateFile(self, file_name),
-            'Creating file <%s>' % self._get_child_path(file_name))
+        self._perform_change(change.CreateFile(self, file_name), "Creating file <%s>" % self._get_child_path(file_name))
         return self.get_child(file_name)
 
     def create_folder(self, folder_name):
-        self._perform_change(
-            change.CreateFolder(self, folder_name),
-            'Creating folder <%s>' % self._get_child_path(folder_name))
+        self._perform_change(change.CreateFolder(self, folder_name), "Creating folder <%s>" % self._get_child_path(folder_name))
         return self.get_child(folder_name)
 
     def _get_child_path(self, name):
         if self.path:
-            return self.path + '/' + name
+            return self.path + "/" + name
         else:
             return name
 
@@ -188,24 +181,21 @@ class Folder(Resource):
             return False
 
     def get_files(self):
-        return [resource for resource in self.get_children()
-                if not resource.is_folder()]
+        return [resource for resource in self.get_children() if not resource.is_folder()]
 
     def get_folders(self):
-        return [resource for resource in self.get_children()
-                if resource.is_folder()]
+        return [resource for resource in self.get_children() if resource.is_folder()]
 
     def contains(self, resource):
         if self == resource:
             return False
-        return self.path == '' or resource.path.startswith(self.path + '/')
+        return self.path == "" or resource.path.startswith(self.path + "/")
 
     def create(self):
         self.parent.create_folder(self.name)
 
 
 class _ResourceMatcher:
-
     def __init__(self):
         self.patterns = []
         self._compiled_patterns = []
@@ -221,18 +211,16 @@ class _ResourceMatcher:
         self.patterns = patterns
 
     def _add_pattern(self, pattern):
-        re_pattern = pattern.replace('.', '\\.').\
-            replace('*', '[^/]*').replace('?', '[^/]').\
-            replace('//', '/(.*/)?')
-        re_pattern = '^(.*/)?' + re_pattern + '(/.*)?$'
+        re_pattern = pattern.replace(".", "\\.").replace("*", "[^/]*").replace("?", "[^/]").replace("//", "/(.*/)?")
+        re_pattern = "^(.*/)?" + re_pattern + "(/.*)?$"
         self.compiled_patterns.append(re.compile(re_pattern))
 
     def does_match(self, resource):
+
         for pattern in self.compiled_patterns:
             if pattern.match(resource.path):
                 return True
-        path = os.path.join(resource.project.address,
-                            *resource.path.split('/'))
+        path = os.path.join(resource.project.address, *resource.path.split("/"))
         if os.path.islink(path):
             return True
         return False
@@ -244,3 +232,16 @@ class _ResourceMatcher:
             for pattern in self.patterns:
                 self._add_pattern(pattern)
         return self._compiled_patterns
+
+
+
+
+
+__all__ = sorted(
+    [
+        getattr(v, "__name__", k)
+        for k, v in list(globals().items())  # export
+        if ((callable(v) and getattr(v, "__module__", "") == __name__ or k.isupper()) and not getattr(v, "__name__", k).startswith("__"))  # callables from this module  # or CONSTANTS
+    ]
+)  # neither marked internal
+

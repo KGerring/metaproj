@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "metaproj"
+version = "0.1.0"
+description = "meta"
+authors = ["Kristen Gerring <KGerring@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+ubelt = "^0.9.5"
+scriptconfig = "^0.5.8"
+pydantic = "^1.8.2"
+pytest = "^6.2.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

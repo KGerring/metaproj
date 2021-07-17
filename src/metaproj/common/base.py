@@ -14,7 +14,7 @@ base module
 
 """
 from __future__ import annotations
-
+import sys
 import contextlib
 import dataclasses
 import inspect
@@ -24,22 +24,34 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Collection, Dict, List, Optional, Protocol, Tuple, Type, Union
 
 import libcst
-import libcst.codemod
+import libcst.codemod as codemod
 import libcst.metadata as metadata
+
 from attr import dataclass
-from libcst import _batched_visitor, _metadata_dependent
 from libcst._metadata_dependent import MetadataDependent
-from libcst.codemod import Codemod, CodemodCommand, CodemodContext, ContextAwareTransformer, VisitorBasedCodemodCommand
 from libcst.codemod.visitors._remove_imports import RemoveImportsVisitor
-from libcst.metadata import (
-    BaseMetadataProvider,
-    BatchableMetadataProvider,
-    CodePosition,
-    MetadataWrapper,
-    ParentNodeProvider,
-    PositionProvider,
-    TypeInferenceProvider,
+from loguru import logger
+
+print(f'uncomment out the imports!!!!!! line 35 {__file__}', file = sys.stderr)
+
+#from libcst import _batched_visitor, _metadata_dependent
+
+from libcst.codemod import (Codemod,
+                            CodemodCommand,
+                            CodemodContext,
+                            ContextAwareTransformer,
+                            VisitorBasedCodemodCommand,
 )
+
+
+#AddImportsVisitor, RemoveImportsVisitor
+
+#from libcst.metadata import ( BaseMetadataProvider, BatchableMetadataProvider,
+#                              CodePosition, MetadataWrapper, ParentNodeProvider, PositionProvider, TypeInferenceProvider,)
+
+TypeInferenceProvider = metadata.TypeInferenceProvider
+PositionProvider = metadata.PositionProvider
+
 from libcst.metadata.name_provider import FullyQualifiedNameProvider
 
 from . import exceptions
@@ -49,10 +61,15 @@ if TYPE_CHECKING:
 	from libcst.metadata.base_provider import ProviderT
 
 CACHE_DEPENDENT_PROVIDERS: Tuple["ProviderT"] = (TypeInferenceProvider, FullyQualifiedNameProvider)
+
 LintRuleT:  Union[Type['CstLintRule'], ['PseudoLintRule']]
+
 metadata: Mapping["ProviderT", Mapping["CSTNode", object]]
+
 METADATA_DEPENDENCIES: ClassVar[Collection["ProviderT"]] = ()
+
 FilePathT = Union[Path, str]
+
 exceptions = exceptions.Error
 
 class ProviderEnsuranceMetaclass(ABCMeta):
@@ -117,10 +134,10 @@ class BaseRuleMixin(ABC):
 				dependencies.update(c.METADATA_DEPENDENCIES)
 		return frozenset(dependencies)
 	
-	def update_children_context(self, context: libcst.codemod.CodemodContext) -> None:
-		for methods in self.leave_methods.values():
-			for method in methods:
-				method.__self__.context = context
+	#def update_children_context(self, context: libcst.codemod.CodemodContext) -> None:
+	#	for methods in self.leave_methods.values():
+	#		for method in methods:
+	#			method.__self__.context = context
 				
 	def warn(self, warning: str) -> None:
 		"""
@@ -166,19 +183,8 @@ class BaseRuleMixin(ABC):
 				replacement_node=replacement,
 		)
 		self.context.reports.append(report)
-
-
-class CstLintRule(BaseRuleMixin, ContextAwareTransformer): pass
-
-
-class _LeaveMethod(Protocol):
-	__self__: "ContextAwareTransformer"
-	__name__: str
-	__qualname__: str
-	def __call__(self, original_node: libcst.CSTNodeT,
-	             updated_node: libcst.CSTNodeT) -> Union[libcst.CSTNodeT, libcst.RemovalSentinel]:
-		...
-
+		
+class CstLintRule(BaseRuleMixin, ContextAwareTransformer, CodemodCommand): pass
 class VisitorMethod(Protocol):
 	pass
 
@@ -197,15 +203,23 @@ def _visit_cst_rules_with_context(
 		context.node_stack.pop()
 	
 	wrapper.visit_batched(rule_instances,
-	                      before_visit=before_visit,
-	                      after_leave=after_leave
-	                      )
+						  before_visit=before_visit,
+						  after_leave=after_leave
+						  )
 
 class Codemod_:
 	"""
 	with self._handle_metadata_reference(tree) as tree_with_metadata:
 		return self.transform_module_impl(tree_with_metadata)
 	"""
+
+class _LeaveMethod(Protocol):
+	__self__: "ContextAwareTransformer"
+	__name__: str
+	__qualname__: str
+	def __call__(self, original_node: libcst.CSTNodeT,
+	             updated_node: libcst.CSTNodeT) -> Union[libcst.CSTNodeT, libcst.RemovalSentinel]:
+		...
 
 class _ContextAwareTransformer(libcst.codemod.Codemod, libcst.CSTTransformer):
 	"""A lean replacement of libcst.codemod.ContextAwareTransformer.
@@ -230,13 +244,14 @@ class _ContextAwareTransformer(libcst.codemod.Codemod, libcst.CSTTransformer):
 		)
 		return dict(methods)
 	
+
 class BatchedCodemod(libcst.codemod.Codemod, libcst.CSTTransformer):
 	"""Codemod which runs multiple transforms at the same time."""
 	
 	def __init__(
 			self,
 			context: libcst.codemod.CodemodContext,
-			transformers: Sequence[Type[ContextAwareTransformer]],
+			transformers: Sequence[Type[_ContextAwareTransformer]],
 			max_executions: int = 10,
 	):
 		libcst.codemod.Codemod.__init__(self, context)
@@ -260,10 +275,8 @@ class BatchedCodemod(libcst.codemod.Codemod, libcst.CSTTransformer):
 			for transform_class in self.transformers:
 				for name, method in transform_class(self.context).get_leave_funcs().items():
 					leave_methods.setdefault(name.replace("leave_", ""), []).append(method)
-			
-			
 			self._batched_transformer = _BatchedTransformer(leave_methods)
-		
+			
 		self._batched_transformer.update_children_context(self.context)
 		
 		logger.debug("Checking {}", self.context.filename)
@@ -319,6 +332,7 @@ class BatchedCodemod(libcst.codemod.Codemod, libcst.CSTTransformer):
 		context = self.context.scratch.get(CONTEXT_KEY, {})
 		return bool(context[self.context.filename])
 
+
 class _BatchedTransformer(libcst.CSTTransformer):
 	def __init__(
 			self,
@@ -360,3 +374,11 @@ class _BatchedTransformer(libcst.CSTTransformer):
 		for methods in self.leave_methods.values():
 			for method in methods:
 				method.__self__.context = context
+
+class CraftierTransformer(_ContextAwareTransformer):
+	def _mark_as_modified(self) -> None:
+		context = self.context.scratch.setdefault(CONTEXT_KEY, {})
+		context[self.context.filename] = True
+		
+
+

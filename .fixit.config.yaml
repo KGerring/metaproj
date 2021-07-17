@@ -10,7 +10,6 @@ filename: .
 fixture_dir: /Users/kristen/repos/Fixit/fixit/tests/fixtures
 packages:
 - fixit.rules
-- fixit.dev_rules
 repo_root: /Users/kristen/repos/Fixit
 rule_config:
   ImportConstraintsRule:

@@ -1,4 +1,6 @@
-from . import exceptions, change, taskhandle
+from __future__ import annotations
+
+from . import change, exceptions, taskhandle
 
 
 class History:
@@ -16,7 +18,8 @@ class History:
     def _load_history(self):
         if self.save:
             result = self.project.data_files.read_data(
-                'history', compress=self.compress, import_=True)
+                    "history", compress=self.compress, import_=True
+            )
             if result is not None:
                 to_change = change.DataToChange(self.project)
                 for data in result[0]:
@@ -43,7 +46,7 @@ class History:
 
     def _remove_extra_items(self):
         if len(self.undo_list) > self.max_undos:
-            del self.undo_list[0:len(self.undo_list) - self.max_undos]
+            del self.undo_list[0 : len(self.undo_list) - self.max_undos]
 
     def _is_change_interesting(self, changes):
         for resource in changes.get_changed_resources():
@@ -51,8 +54,7 @@ class History:
                 return True
         return False
 
-    def undo(self, change=None, drop=False,
-             task_handle=taskhandle.NullTaskHandle()):
+    def undo(self, change=None, drop=False, task_handle=taskhandle.NullTaskHandle()):
         """Redo done changes from the history
 
         When `change` is `None`, the last done change will be undone.
@@ -66,15 +68,15 @@ class History:
 
         """
         if not self._undo_list:
-            raise exceptions.HistoryError('Undo list is empty')
+            raise exceptions.HistoryError("Undo list is empty")
         if change is None:
             change = self.undo_list[-1]
         dependencies = self._find_dependencies(self.undo_list, change)
         self._move_front(self.undo_list, dependencies)
         self._perform_undos(len(dependencies), task_handle)
-        result = self.redo_list[-len(dependencies):]
+        result = self.redo_list[-len(dependencies) :]
         if drop:
-            del self.redo_list[-len(dependencies):]
+            del self.redo_list[-len(dependencies) :]
         return result
 
     def redo(self, change=None, task_handle=taskhandle.NullTaskHandle()):
@@ -88,13 +90,13 @@ class History:
 
         """
         if not self.redo_list:
-            raise exceptions.HistoryError('Redo list is empty')
+            raise exceptions.HistoryError("Redo list is empty")
         if change is None:
             change = self.redo_list[-1]
         dependencies = self._find_dependencies(self.redo_list, change)
         self._move_front(self.redo_list, dependencies)
         self._perform_redos(len(dependencies), task_handle)
-        return self.undo_list[-len(dependencies):]
+        return self.undo_list[-len(dependencies) :]
 
     def _move_front(self, change_list, changes):
         for change in changes:
@@ -109,8 +111,7 @@ class History:
         for i in range(count):
             self.current_change = self.undo_list[-1]
             try:
-                job_set = change.create_job_set(task_handle,
-                                                self.current_change)
+                job_set = change.create_job_set(task_handle, self.current_change)
                 self.current_change.undo(job_set)
             finally:
                 self.current_change = None
@@ -120,8 +121,7 @@ class History:
         for i in range(count):
             self.current_change = self.redo_list[-1]
             try:
-                job_set = change.create_job_set(task_handle,
-                                                self.current_change)
+                job_set = change.create_job_set(task_handle, self.current_change)
                 self.current_change.do(job_set)
             finally:
                 self.current_change = None
@@ -141,12 +141,10 @@ class History:
     def _search_for_change_contents(self, change_list, file):
         for change_ in reversed(change_list):
             if isinstance(change_, change.ChangeSet):
-                result = self._search_for_change_contents(change_.changes,
-                                                          file)
+                result = self._search_for_change_contents(change_.changes, file)
                 if result is not None:
                     return result
-            if isinstance(change_, change.ChangeContents) and \
-               change_.resource == file:
+            if isinstance(change_, change.ChangeContents) and change_.resource == file:
                 return change_.old_contents
 
     def write(self):
@@ -156,8 +154,7 @@ class History:
             self._remove_extra_items()
             data.append([to_data(change_) for change_ in self.undo_list])
             data.append([to_data(change_) for change_ in self.redo_list])
-            self.project.data_files.write_data('history', data,
-                                               compress=self.compress)
+            self.project.data_files.write_data("history", data, compress=self.compress)
 
     def get_file_undo_list(self, resource):
         result = []
@@ -167,8 +164,7 @@ class History:
         return result
 
     def __str__(self):
-        return 'History holds %s changes in memory' % \
-               (len(self.undo_list) + len(self.redo_list))
+        return "History holds %s changes in memory" % (len(self.undo_list) + len(self.redo_list))
 
     undo_list = property(lambda self: self._undo_list)
     redo_list = property(lambda self: self._redo_list)
@@ -188,17 +184,17 @@ class History:
     @property
     def max_undos(self):
         if self._maxundos is None:
-            return self.project.prefs.get('max_history_items', 100)
+            return self.project.prefs.get("max_history_items", 100)
         else:
             return self._maxundos
 
     @property
     def save(self):
-        return self.project.prefs.get('save_history', False)
+        return self.project.prefs.get("save_history", False)
 
     @property
     def compress(self):
-        return self.project.prefs.get('compress_history', False)
+        return self.project.prefs.get("compress_history", False)
 
     def clear(self):
         """Forget all undo and redo information"""
@@ -207,7 +203,6 @@ class History:
 
 
 class _FindChangeDependencies:
-
     def __init__(self, change_list):
         self.change = change_list[0]
         self.change_list = change_list
@@ -233,3 +228,15 @@ class _FindChangeDependencies:
                 if changed.is_folder() and changed.contains(resource):
                     return True
         return False
+
+
+
+__all__ = sorted(
+    [
+        getattr(v, "__name__", k)
+        for k, v in list(globals().items())  # export
+        if ((callable(v) and getattr(v, "__module__", "") == __name__ or k.isupper()) and not getattr(v, "__name__", k).startswith("__"))  # callables from this module  # or CONSTANTS
+    ]
+)  # neither marked internal
+
+

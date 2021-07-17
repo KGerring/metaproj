@@ -111,7 +111,9 @@ class DotDict(MutableMapping):
 D = TypeVar("D", bound=Union[dict, MutableMapping])
 DictLike = Union[dict, DotDict]
 INTERPOLATION_REGEX: Pattern[str] = re.compile(r"\${(.[^${}]*)}")
-DOTENV_REGEX: Pattern[str] = re.compile(r'\$\{(?P<name>[^\}:]*)(?::-(?P<default>[^\}]*))?\}')
+DOTENV_REGEX: Pattern[str] = re.compile(
+        r'\$\{(?P<name>[^\}:]*)(?::-(?P<default>[^\}]*))?\}'
+)
 ENV_VAR_PREFIX = "FIXIT"
 DEFAULT_CONFIG = fixit_config.LINT_CONFIG_TOML_NAME.resolve() #LINT_CONFIG_TOML_NAME
 YAML_CONFIG =   fixit_config.LINT_CONFIG_FILE_NAME.resolve()

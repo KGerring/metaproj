@@ -1,3 +1,4 @@
+
 """Files and folders in a project are represented as resource objects.
 
 Files and folders are access through `Resource` objects. `Resource` has
@@ -26,18 +27,18 @@ getting the path relative to the project's root (via `path`), reading
 from and writing to the resource, moving the resource, etc.
 """
 
+from __future__ import annotations
+
 import os
 import re
 
-from . import exceptions, change, fscommands
-from .change import ChangeSet, ChangeContents
-from .resources import Resource, File, Folder, _ResourceMatcher
-from . import change
+from . import change, exceptions, fscommands
+from .change import ChangeContents, ChangeSet
+from .resources import File, Folder, Resource, _ResourceMatcher
 
 
 class ChangeStack:
-
-    def __init__(self, project, description='merged changes'):
+    def __init__(self, project, description="merged changes"):
         self.project = project
         self.description = description
         self.stack = []
@@ -66,7 +67,8 @@ class ChangeStack:
             yield changes
 
 
-CS_DOC ("""For performing many refactorings as a single command
+CS_DOC(
+    """For performing many refactorings as a single command
 
 `changestack` module can be used to perform many refactorings on top
 of each other as one bigger command.  It can be used like::
@@ -84,4 +86,15 @@ of each other as one bigger command.  It can be used like::
   changes = stack.merged()
 
 Now `changes` can be previewed or performed as before.
-""")
+"""
+)
+
+__all__ = sorted(
+    [
+        getattr(v, "__name__", k)
+        for k, v in list(globals().items())  # export
+        if ((callable(v) and getattr(v, "__module__", "") == __name__ or k.isupper()) and not getattr(v, "__name__", k).startswith("__"))  # callables from this module  # or CONSTANTS
+    ]
+)  # neither marked internal
+
+

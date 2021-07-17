@@ -90,51 +90,51 @@ types = ['dict']
 ### now metadata
 [[metadata]]
 tname = 'provides'
-types = list-comma
+types = ["list-comma"]
 
 [[metadata]]
 tname = 'name'
-types = str
+types = ['str']
 
 [[metadata]]
 tname = 'obsoletes'
-types = list-comma
+types = ["list-comma"]
 
 [[metadata]]
 tname = 'license'
-types = str
+types = ["str"]
 
 [[metadata]]
 tname = 'keywords'
-types = list-comma
+types = ["list-comma"]
 
 [[metadata]]
 tname = 'project_urls'
-types = dict
+types = ['dict']
 
 [[metadata]]
 tname = 'maintainer'
-types = str
+types = ['src']
 
 [[metadata]]
 tname = 'license_file'
-types = str
+types = ['src']
 
 [[metadata]]
 tname = 'long_description_content_type'
-types = str
+types = ['src']
 
 [[metadata]]
 tname = 'license_files'
-types = list-comma
+types = ['list-comma']
 
 [[metadata]]
 tname = 'author'
-types = str
+types = ['str']
 
 [[metadata]]
 tname = 'requires'
-types = list-comma
+types = ['list-comma']
 
 [[metadata]]
 tname = 'version'

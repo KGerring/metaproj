@@ -22,23 +22,20 @@ import tokenize
 from pathlib import Path
 from types import ModuleType
 from typing import AnyStr, Dict, Iterable, List, Optional, Set, Type, Union
-
+import codecs
 from attr import dataclass
 from fixit.common.base import CstLintRule, LintConfig
-
 from . import config  # LintConfig
-
 import os  # isort:skip
 import re  # isort:skip
 
 LintRuleCollectionT = Set[Union[Type[CstLintRule], Type['PseudoLintRule']]]
+
 DEFAULT_FILENAME: str = "not/a/real/file/path.py"
 
 DEFAULT_CONFIG: LintConfig = LintConfig(
 		repo_root=str(Path(__file__).parent.parent),  # Set base config repo_root to `fixit` directory for testing.
 )
-
-
 
 def _dedent(src: str) -> str:
 	src = re.sub(r"\A\n", "", src)
@@ -176,8 +173,6 @@ def is_rule(obj: object) -> bool:
 	
 	return False
 
-
-
 class TestCase:
 	code: str
 	filename: str = DEFAULT_FILENAME
@@ -207,7 +202,6 @@ class InvalidTestCase(TestCase):
 	def expected_str(self) -> str:
 		return f"{_str_or_any(self.line)}:{_str_or_any(self.column)}: {self.kind} ..."
 
-###
 def import_submodules(package: str, recursive: bool = True) -> Dict[str, ModuleType]:
 	""" Import all submodules of a module, recursively, including subpackages. """
 	package: ModuleType = importlib.import_module(package)
@@ -221,6 +215,7 @@ def import_submodules(package: str, recursive: bool = True) -> Dict[str, ModuleT
 		if recursive and is_pkg:
 			results.update(import_submodules(full_name))
 	return results
+
 
 def import_distinct_rules_from_package(
 		package: str,
@@ -298,7 +293,10 @@ def import_rule_from_package(
 			return rule
 	return rule
 
-def find_and_import_rule(rule_class_name: str, packages: List[str]) -> LintRuleT:
+def find_and_import_rule(
+		rule_class_name: str,
+		packages: List[str]
+) -> LintRuleT:
 	for package in packages:
 		imported_rule = import_rule_from_package(package, rule_class_name)
 		if imported_rule is not None:
@@ -309,6 +307,7 @@ def find_and_import_rule(rule_class_name: str, packages: List[str]) -> LintRuleT
 			f"Could not find lint rule {rule_class_name} in the following packages: \n"
 			+ "\n".join(packages)
 	)
+
 
 if __name__ == '__main__':
 	print(__file__)

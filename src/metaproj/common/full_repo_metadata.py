@@ -46,11 +46,10 @@ class FullRepoMetadataConfig:
 
     """
 
-    # pyre-fixme[8]: Attribute has type
     #  `Set[Type[meta.base_provider.BaseMetadataProvider[object]]]`; used as
     #  `frozenset[Variable[_T_co](covariant)]`.
     providers: Set[ProviderT] = field(
-        # pyre-fixme[16]: Module `meta` has no attribute `FullyQualifiedNameProvider`.
+
         default=frozenset([TypeInferenceProvider, FullyQualifiedNameProvider])
     )
     timeout_seconds: int = 10
@@ -160,13 +159,17 @@ class MetadataCacheErrorHandler(Handler):
                     self.other_exceptions[exc_type] += failed_paths
 
 def metadata_caches_filter(rule: CstLintRule) -> bool:
-    # pyre-fixme[6]: Expected `Type[typing.Any]` for 1st param but got `CstLintRule`.
     return issubclass(rule, CstLintRule) and getattr(rule, "requires_metadata_caches")()
 
-def rules_require_metadata_cache(rules: LintRuleCollectionT) -> bool:
+def rules_require_metadata_cache(
+        rules: LintRuleCollectionT
+) -> bool:
     return any(issubclass(r, CstLintRule) and getattr(r, "requires_metadata_caches")() for r in rules)
 
-def get_metadata_caches(cache_timeout: int, file_paths: Iterable[str]) -> Mapping[str, Mapping[ProviderT, object]]:
+
+def get_metadata_caches(cache_timeout: int,
+                        file_paths: Iterable[str]
+                        ) -> Mapping[str, Mapping[ProviderT, object]]:
     """
     Returns a metadata cache for each file in ``file_paths``.
     # Let user know of any cache retrieval failures.
@@ -175,9 +178,8 @@ def get_metadata_caches(cache_timeout: int, file_paths: Iterable[str]) -> Mappin
     logger: Logger = getLogger("Metadata Caches Logger")
     handler = MetadataCacheErrorHandler()
     logger.addHandler(handler)
-    # pyre-fixme[28]: Unexpected keyword argument `providers`.
     full_repo_metadata_config: FullRepoMetadataConfig = FullRepoMetadataConfig(
-        # pyre-fixme[16]: Module `meta` has no attribute `FullyQualifiedNameProvider`.
+
         providers={TypeInferenceProvider, FullyQualifiedNameProvider},
         timeout_seconds=cache_timeout,
         batch_size=100,
@@ -196,7 +198,6 @@ def get_metadata_caches(cache_timeout: int, file_paths: Iterable[str]) -> Mappin
         print(f"Encountered exception {k} for the following paths:\n" + "\n".join(v))
         print_yellow("Running `pyre start` may solve the issue.")
     return metadata_caches
-
 
 __all__ = sorted(
     [

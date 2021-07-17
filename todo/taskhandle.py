@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from . import exceptions
 
-class TaskHandle:
 
-    def __init__(self, name='Task', interrupts=True):
+class TaskHandle:
+    def __init__(self, name="Task", interrupts=True):
         """Construct a TaskHandle
 
         If `interrupts` is `False` the task won't be interrupted by
@@ -41,7 +43,7 @@ class TaskHandle:
     def get_jobsets(self):
         return self.job_sets
 
-    def create_jobset(self, name='JobSet', count=None):
+    def create_jobset(self, name="JobSet", count=None):
         result = JobSet(self, name=name, count=count)
         self.job_sets.append(result)
         self._inform_observers()
@@ -51,9 +53,13 @@ class TaskHandle:
         for observer in list(self.observers):
             observer()
 
+
 class JobSet:
 
-    def __init__(self, handle, name, count):
+    handle: TaskHandle
+    name: str 
+    
+    def __init__(self, handle: TaskHandle, name: str, count):
         self.handle = handle
         self.name = name
         self.count = count
@@ -86,8 +92,8 @@ class JobSet:
     def get_name(self):
         return self.name
 
-class NullTaskHandle:
 
+class NullTaskHandle:
     def __init__(self):
         pass
 
@@ -106,8 +112,8 @@ class NullTaskHandle:
     def add_observer(self, observer):
         pass
 
-class NullJobSet:
 
+class NullJobSet:
     def started_job(self, name):
         pass
 
@@ -125,3 +131,14 @@ class NullJobSet:
 
     def get_name(self):
         pass
+
+
+__all__ = sorted(
+    [
+        getattr(v, "__name__", k)
+        for k, v in list(globals().items())  # export
+        if ((callable(v) and getattr(v, "__module__", "") == __name__ or k.isupper()) and not getattr(v, "__name__", k).startswith("__"))  # callables from this module  # or CONSTANTS
+    ]
+)  # neither marked internal
+
+

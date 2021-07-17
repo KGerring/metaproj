@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Error(Exception):
     """Base exception for rope"""
 
@@ -46,7 +49,7 @@ class ModuleSyntaxError(Error):
         self.filename = filename
         self.lineno = lineno
         self.message_ = message
-        super().__init__(f'Syntax error in file <{filename}> line <{lineno}>: {message}')
+        super().__init__(f"Syntax error in file <{filename}> line <{lineno}>: {message}")
 
 
 class ModuleDecodeError(Error):
@@ -55,4 +58,15 @@ class ModuleDecodeError(Error):
     def __init__(self, filename, message):
         self.filename = filename
         self.message_ = message
-        super().__init__(f'Cannot decode file <{filename}>: {message}')
+        super().__init__(f"Cannot decode file <{filename}>: {message}")
+
+
+
+__all__ = sorted(
+    [
+        getattr(v, "__name__", k)
+        for k, v in list(globals().items())  # export
+        if ((callable(v) and getattr(v, "__module__", "") == __name__ or k.isupper()) and not getattr(v, "__name__", k).startswith("__"))  # callables from this module  # or CONSTANTS
+    ]
+)  # neither marked internal
+        
