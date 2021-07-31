@@ -140,9 +140,16 @@ class LoggerTransformer(cst.CSTTransformer):
     def get_parent(self, node) -> CSTNodeT:
         return self.get_metadata(cst.metadata.ParentNodeProvider, node)
     
-    def handle_string(self,
-                      original_node: SimpleStatementLine,
-                      updated_node: SimpleStatementLine):pass
+    @m.call_if_not_inside(m.SimpleStatementLine())
+    def leave_line(self, original_node, updated_node):
+        return updated_node
+    
+    @m.call_if_inside(m.Call())
+    def leave_call(self, original_node, updated_node):
+        if not (original_node.func.value == 'print'):
+            return line_node
+    
+        
     
     def on_leave(self,
                  original_node: CSTNodeT,
@@ -163,6 +170,7 @@ class LoggerTransformer(cst.CSTTransformer):
         if not (isinstance(node, Call) and node.func.value == 'print'):
             return line_node
         
+        #Arg.value, Arg.keyword
         pos_args = [x.value for x in node.args if not x.keyword]
         
         has_vars = False
@@ -552,7 +560,8 @@ def modify(
         wrapper = cst.metadata.MetadataWrapper(source_tree)
         modified_tree = wrapper.visit(transformer)
         if source_tree != modified_tree:
-            path.write_text(modified_tree.code)
+            return modified_tree.code
+            #path.write_text(modified_tree.code)
 
 
 def confirm_action(desc='Really execute?') -> bool:

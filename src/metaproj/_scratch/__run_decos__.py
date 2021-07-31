@@ -10,7 +10,7 @@
 
 """
 
-__all__ = [] 
+from __future__ import annotations
 import sys # isort:skip
 import os # isort:skip
 import re # isort:skip
